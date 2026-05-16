@@ -1,0 +1,43 @@
+# Credentials and secrets
+*.env
+.env.*
+secrets.py
+config_secrets.py
+
+# Kafka credentials
+kafka_config.json
+confluent_config.json
+
+# Databricks
+.databricks/
+databricks.yml
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# Jupyter / notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Checkpoints (stored in Unity Catalog Volumes)
+checkpoints/
+
+# MLflow local artifacts
+mlruns/
+mlartifacts/
+
+# IDE
+.vscode/
+.idea/
