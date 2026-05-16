@@ -38,7 +38,7 @@ print(f'Features      : {FEATURE_COLS}')
 # Cell 2: Train Isolation Forest and log everything to MLflow with signature
 from mlflow.models.signature import infer_signature
 
-mlflow.set_experiment('/Users/ifeanyinjoku2@gmail.com/pipeline_leak_anomaly_detection')
+mlflow.set_experiment('/Users/your-email@gmail.com/pipeline_leak_anomaly_detection')
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
@@ -106,7 +106,7 @@ client = MlflowClient()
 DETECTOR_MODEL = 'workspace.default.pipeline_leak_detector'
 SCALER_MODEL   = 'workspace.default.pipeline_scaler'
 
-# Get latest version of leak detector and set production alias
+# Get the latest version of the leak detector and set production alias
 versions = client.search_model_versions(f"name='{DETECTOR_MODEL}'")
 latest   = max([int(v.version) for v in versions])
 
@@ -116,7 +116,7 @@ client.set_registered_model_alias(
     version=latest
 )
 
-# Get latest version of scaler and set production alias
+# Get the latest version of Scaler and set production alias
 versions_sc = client.search_model_versions(f"name='{SCALER_MODEL}'")
 latest_sc   = max([int(v.version) for v in versions_sc])
 
