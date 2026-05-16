@@ -18,10 +18,10 @@ from datetime import datetime, timezone
 
 # ── Confluent Cloud connection config ─────────────────────────
 # Replace with your actual values from Confluent Cloud
-BOOTSTRAP_SERVERS = 'pkc-619z3.us-east1.gcp.confluent.cloud:9092'
-API_KEY           = 'YHJJTFDRUMPG6QFM'      # Type the API Key here
-API_SECRET        = 'cfltuoEjQPGY4MtOtX4NaQe2Dj+QnACOEXnh86Xw+3iZqHVN/IzN0aCTJV8IkOcQ'   # Paste from downloaded file
-KAFKA_TOPIC       = 'pipeline_sensors'
+BOOTSTRAP_SERVERS = "your-kafka-bootstrap-server"
+API_KEY           = "your-kafka-api-key"      # Type the API Key here
+API_SECRET        = "your-kafka-api-secret"   # Paste from downloaded file
+KAFKA_TOPIC       = "pipeline-sensor-data"
 
 PRODUCER_CONFIG = {
     'bootstrap.servers':                     BOOTSTRAP_SERVERS,
