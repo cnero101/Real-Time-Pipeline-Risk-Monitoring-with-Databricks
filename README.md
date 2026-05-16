@@ -1,48 +1,76 @@
-# Real-Time Pipeline Risk Monitoring with Databricks
+# 🛢️ Real-Time Pipeline Risk Monitoring with Databricks
 
-A production-grade, end-to-end real-time pipeline leak detection system built on Databricks, using a medallion architecture (Bronze → Silver → Gold), Apache Kafka for streaming ingestion, and an Isolation Forest ML model for anomaly detection. The system monitors 5 pipeline segments in real time, scores sensor readings every 30 minutes, and fires automated email alerts when critical leaks are detected.
-
----
-
-## Architecture
-
-```
-Kafka (sensor data)
-        │
-        ▼
-┌─────────────────────────────────┐
-│  BRONZE — raw ingestion         │  5,350 records · Delta table
-│  04_structured_streaming        │  Kafka → Bronze (batch + stream)
-└─────────────────────────────────┘
-        │
-        ▼
-┌─────────────────────────────────┐
-│  SILVER — feature engineering   │  10,185 records · Delta table
-│  02_silver_transformation       │  pressure delta, flow imbalance,
-│                                 │  acoustic z-score, rolling stats
-└─────────────────────────────────┘
-        │
-        ▼
-┌─────────────────────────────────┐
-│  ML MODEL — anomaly detection   │  Isolation Forest · MLflow registry
-│  03_model_training              │  100% precision on test set
-└─────────────────────────────────┘
-        │
-        ▼
-┌─────────────────────────────────┐
-│  GOLD — scored alerts           │  4,845 alerts · Delta table
-│  03_gold_scoring                │  CRITICAL / WARNING / NORMAL
-└─────────────────────────────────┘
-        │
-   ┌────┴────┬────────────┐
-   ▼         ▼            ▼
-SQL       Streamlit    Email alerts
-Dashboard   App       (every 30 min)
-```
+![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)
+![Databricks](https://img.shields.io/badge/Databricks-Serverless-red?logo=databricks&logoColor=white)
+![Apache Kafka](https://img.shields.io/badge/Apache%20Kafka-Confluent%20Cloud-black?logo=apachekafka&logoColor=white)
+![Delta Lake](https://img.shields.io/badge/Delta%20Lake-Medallion%20Architecture-00ADD8)
+![MLflow](https://img.shields.io/badge/MLflow-Model%20Registry-0194E2?logo=mlflow&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-Deployed-FF4B4B?logo=streamlit&logoColor=white)
+![Status](https://img.shields.io/badge/Pipeline-Live%20%E2%9C%85-brightgreen)
 
 ---
 
-## Tech Stack
+A production-grade, end-to-end real-time pipeline leak detection system built on Databricks. The system ingests live sensor data from Apache Kafka, processes it through a three-layer medallion architecture, scores each reading with an Isolation Forest ML model tracked in MLflow, and fires automated email alerts within 30 minutes of detecting a critical leak.
+
+> **5 pipeline segments monitored · 4,845 alerts scored · 100% pipeline run success rate · Automated every 30 minutes**
+
+---
+
+## 📸 Screenshots
+
+### SQL Dashboard — Live Monitoring
+![SQL Dashboard](assets/sql_dashboard.png)
+
+### Critical Alert Email
+![Alert Email](assets/alert_email.png)
+
+---
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                   DATA SOURCES                          │
+│         5 Pipe Segments · Confluent Cloud Kafka         │
+└─────────────────────────┬───────────────────────────────┘
+                          │  real-time stream
+                          ▼
+┌─────────────────────────────────────────────────────────┐
+│              BRONZE — Raw Ingestion                     │
+│   04_structured_streaming · Delta Lake · 5,350 records  │
+│   Kafka → Bronze (batch backfill + availableNow stream) │
+└─────────────────────────┬───────────────────────────────┘
+                          │  feature engineering
+                          ▼
+┌─────────────────────────────────────────────────────────┐
+│              SILVER — Feature Engineering               │
+│   02_silver_transformation · Delta Lake · 10,185 records│
+│   pressure delta · flow imbalance · acoustic z-score    │
+└─────────────────────────┬───────────────────────────────┘
+                          │  ML scoring
+                          ▼
+┌─────────────────────────────────────────────────────────┐
+│         Isolation Forest · MLflow Model Registry        │
+│   03_model_training · 100% precision · contamination 8% │
+└─────────────────────────┬───────────────────────────────┘
+                          │  alerts
+                          ▼
+┌─────────────────────────────────────────────────────────┐
+│              GOLD — Scored Alerts                       │
+│   03_gold_scoring · Delta Lake · 4,845 alerts           │
+│   CRITICAL / WARNING / NORMAL severity                  │
+└──────────┬──────────────┬──────────────┬────────────────┘
+           │              │              │
+           ▼              ▼              ▼
+    SQL Dashboard   Streamlit App   Email Alerts
+    (live KPIs)    (interactive)   (every 30 min)
+```
+
+**Automated Databricks Job** — 5 tasks, scheduled every 30 minutes, 100% success rate.
+
+---
+
+## 🛠️ Tech Stack
 
 | Component | Technology |
 |---|---|
@@ -50,94 +78,83 @@ Dashboard   App       (every 30 min)
 | Data platform | Databricks (Serverless) |
 | Storage format | Delta Lake (medallion architecture) |
 | ML framework | Scikit-learn Isolation Forest |
-| ML tracking | MLflow (Databricks managed) |
-| Orchestration | Databricks Jobs (scheduled every 30 min) |
+| ML tracking | MLflow (Databricks managed registry) |
+| Orchestration | Databricks Jobs (5-task DAG, 30-min schedule) |
 | Dashboard | Databricks SQL Dashboard |
-| App | Streamlit (Databricks Apps) |
-| Language | Python (PySpark, pandas) |
+| Web app | Streamlit (deployed on Databricks Apps) |
+| Language | Python 3.11 (PySpark, pandas, scikit-learn) |
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
 ```
-pipeline-leak-monitoring/
+Real-Time-Pipeline-Risk-Monitoring-with-Databricks/
 │
 ├── 01_ingestion/
-│   └── 01_sensor_data_generator.py     # Kafka producer — simulates 5 pipe segments
+│   └── 01_sensor_data_generator.py     # Kafka producer — 5 pipe segments
 │
 ├── 02_streaming/
-│   ├── 02_silver_transformation.py     # Bronze → Silver batch feature engineering
-│   ├── 03_gold_scoring.py             # Silver → Gold MLflow model scoring
+│   ├── 02_silver_transformation.py     # Bronze → Silver feature engineering
+│   ├── 03_gold_scoring.py             # Silver → Gold MLflow scoring
 │   └── 04_structured_streaming.py     # Kafka → Bronze real-time stream
 │
 ├── 03_ml_models/
-│   ├── 03_model_training.py           # Isolation Forest training + MLflow logging
+│   ├── 03_model_training.py           # Isolation Forest + MLflow logging
 │   └── 04_lstm_model.py              # LSTM model (experimental)
 │
 ├── 04_dashboard/
-│   ├── 04_dashboard_queries.py        # SQL dashboard query definitions
-│   └── 05_alert_engine.py            # Email alert logic + HTML formatting
+│   ├── 04_dashboard_queries.py        # SQL dashboard queries
+│   └── 05_alert_engine.py            # Email alert engine
 │
-└── streamlit_app/
-    ├── app.py                         # Streamlit dashboard application
-    ├── requirements.txt               # Python dependencies
-    └── app.yaml                       # Databricks Apps config
+├── streamlit_app/
+│   ├── app.py                         # Streamlit dashboard
+│   ├── requirements.txt               # Dependencies
+│   └── app.yaml                       # Databricks Apps config
+│
+├── assets/
+│   ├── sql_dashboard.png              # Dashboard screenshot
+│   └── alert_email.png               # Alert email screenshot
+│
+├── README.md
+├── PORTFOLIO_SUMMARY.md
+├── NOTEBOOK_DESCRIPTIONS.md
+└── .gitignore
 ```
 
 ---
 
-## Notebooks
+## 📊 Medallion Tables
 
-### 01_sensor_data_generator
-Simulates real-time sensor data for 5 pipeline segments (PIPE-001 through PIPE-005) and publishes to a Kafka topic. Each record contains:
-- `event_id`, `pipe_segment_id`, `event_timestamp`
-- `pressure_psi` (normal range: 800–1,200 PSI)
-- `flow_rate_lpm` (litres per minute)
-- `acoustic_g_rms` (vibration — escaping fluid indicator)
-- `temperature_c`
-- `is_anomaly` (ground truth label for training)
+| Table | Records | Description |
+|---|---|---|
+| `bronze_sensor_raw` | 5,350 | Raw Kafka events, ingestion timestamp |
+| `silver_sensor_clean` | 10,185 | Engineered features, partitioned by segment |
+| `gold_alerts` | 4,845 | Scored alerts with severity + alert message |
 
-### 02_silver_transformation
-Reads Bronze Delta table and engineers features used by the ML model:
-- `pressure_delta` — drop vs. previous reading (lag-1 window)
-- `flow_imbalance_ratio` — deviation from 1,000 LPM baseline
-- `acoustic_zscore` — standard deviations from segment mean
-- Rolling averages for pressure, flow, and acoustic signal
-
-### 03_gold_scoring
-Loads the registered MLflow Isolation Forest model and scores Silver records:
-- Predicts `anomaly_prediction` (-1 = anomaly, 1 = normal)
-- Computes `anomaly_score` (decision function — more negative = more anomalous)
-- Assigns severity: `CRITICAL` (score ≤ -0.07), `WARNING` (-0.07 to 0), `NORMAL` (> 0)
-- Generates human-readable `alert_message` with triggered sensor details
-
-### 04_structured_streaming
-Implements both batch and streaming ingestion from Kafka to Bronze:
-- Cell 5: batch read (historical backfill)
-- Cell 6: streaming read with `availableNow` trigger
-- Cell 8: Bronze → Silver streaming transformation via `foreachBatch`
-- Fixes `DELTA_FAILED_TO_MERGE_FIELDS` timestamp error using `to_timestamp()` cast
-
-### 03_model_training
-Trains the Isolation Forest anomaly detector:
-- StandardScaler for feature normalisation
-- Isolation Forest with `contamination=0.08`
-- Logs model, scaler, metrics, and feature importance to MLflow
-- Registers model to MLflow Model Registry
-
-### 05_alert_engine
-Checks Gold table for critical events and sends email alerts:
-- Queries top critical segments ranked by severity
-- Builds HTML-formatted alert email with sensor trigger details
-- Sends via SMTP to configured recipients
-- Fires as task 4 in the automated pipeline job
+All tables live in `main.pipeline_leak` Unity Catalog schema.
 
 ---
 
-## Automated Pipeline
+## 🤖 ML Model Performance
 
-The pipeline runs as a Databricks Job with 5 tasks scheduled every 30 minutes:
+| Metric | Value |
+|---|---|
+| Model | Isolation Forest (unsupervised) |
+| Training records | 495 sensor readings |
+| Precision on test set | 100% |
+| Anomaly contamination | 8% |
+| Score range | -0.117 → +0.026 |
+| CRITICAL threshold | anomaly_score ≤ -0.07 |
+| WARNING threshold | -0.07 < anomaly_score ≤ 0 |
+
+**Why Isolation Forest?** Unsupervised anomaly detection is the right fit here since true leak labels are rare in production. Isolation Forest handles high-dimensional sensor data well and is fast to retrain as new data arrives.
+
+---
+
+## ⚙️ Automated Pipeline
+
+The pipeline runs as a Databricks Job with 5 dependent tasks:
 
 ```
 01_generate_sensor_data
@@ -155,42 +172,54 @@ The pipeline runs as a Databricks Job with 5 tasks scheduled every 30 minutes:
 05_model_retraining
 ```
 
-All recent runs have succeeded with an average runtime of 1–2 minutes end-to-end.
+- Schedule: every 30 minutes
+- Average runtime: 1–2 minutes end-to-end
+- All runs: ✅ succeeded
 
 ---
 
-## Medallion Tables
+## 🚨 Alert Email
 
-| Table | Records | Description |
-|---|---|---|
-| `main.pipeline_leak.bronze_sensor_raw` | 5,350 | Raw Kafka events with ingestion timestamp |
-| `main.pipeline_leak.silver_sensor_clean` | 10,185 | Engineered features, cleaned, partitioned |
-| `main.pipeline_leak.gold_alerts` | 4,845 | Scored alerts with severity and alert message |
+When critical leaks are detected the alert engine fires an HTML email containing:
 
----
-
-## ML Model Performance
-
-| Metric | Value |
-|---|---|
-| Model | Isolation Forest |
-| Training records | 495 sensor readings |
-| Precision on test set | 100% |
-| Anomaly contamination | 8% |
-| Score range | -0.117 (most anomalous) to +0.026 (most normal) |
-| CRITICAL threshold | anomaly_score ≤ -0.07 |
+- Segments affected, ranked by severity and critical event count
+- Per-segment readings: min/avg pressure, avg flow rate, avg acoustic signal
+- Specific sensor triggers (e.g. `"Pressure drop -459 PSI; Flow spike x1.27; Acoustic anomaly z=2.84"`)
+- Immediate action steps for the on-call engineer
+- Link to the live SQL dashboard
 
 ---
 
-## Setup & Prerequisites
+## 🔧 Key Engineering Decisions
 
-### Requirements
+**`to_timestamp()` cast before Delta write**
+Kafka delivers all payloads as strings. Writing `event_timestamp` as a string to a Bronze table that already had it as `TimestampType` threw `DELTA_FAILED_TO_MERGE_FIELDS`. Fixed by casting before the write.
+
+**`foreachBatch` for streaming Silver**
+Window functions (`lag`, `avg`, `stddev`) don't work directly on streaming DataFrames — Spark doesn't have the full partition in memory. `foreachBatch` converts each micro-batch to a static DataFrame, applies window logic, then writes to Silver.
+
+**`availableNow` trigger on Serverless**
+Databricks Serverless doesn't support continuous `processingTime` triggers. `availableNow` processes all messages available since the last run and stops cleanly, which pairs perfectly with the 30-minute scheduled job.
+
+**Severity threshold calibration**
+The model's decision function scores ranged from -0.117 to +0.026, not the standard -0.5 to 0. Inspected the actual score distribution and calibrated thresholds to match the real data range.
+
+---
+
+## 🚀 Setup
+
+### Prerequisites
 - Databricks workspace (free tier or above)
 - Confluent Cloud Kafka cluster (free tier works)
 - Python 3.11+
 
-### Environment variables / secrets
-Set these as Databricks secrets or notebook variables:
+### 1. Create the Unity Catalog schema
+```sql
+CREATE SCHEMA IF NOT EXISTS main.pipeline_leak;
+```
+
+### 2. Set credentials
+In each notebook, update these variables:
 ```python
 BOOTSTRAP_SERVERS = "your-kafka-bootstrap-server"
 API_KEY           = "your-kafka-api-key"
@@ -202,52 +231,33 @@ SMTP_PASSWORD     = "your-app-password"
 ALERT_RECIPIENTS  = ["recipient@email.com"]
 ```
 
-### Unity Catalog
-All tables use the `main.pipeline_leak` schema. Create it before running:
-```sql
-CREATE SCHEMA IF NOT EXISTS main.pipeline_leak;
+### 3. Run in order
+```
+1. 01_sensor_data_generator     # populate Kafka
+2. 04_structured_streaming      # Bronze + Silver ingestion
+3. 03_model_training            # train + register MLflow model
+4. 03_gold_scoring              # score and populate Gold
+5. Set up Databricks Job        # automate on a schedule
 ```
 
-### Running the pipeline
-1. Run `01_sensor_data_generator` to populate Kafka with sensor data
-2. Run `04_structured_streaming` to ingest Bronze and Silver
-3. Run `03_model_training` to train and register the MLflow model
-4. Run `03_gold_scoring` to score and populate Gold
-5. Set up the Databricks Job to automate all steps on a schedule
+### 4. Deploy the Streamlit app
+```
+1. Upload streamlit_app/ to Databricks Workspace
+2. Go to Compute → Apps → Create App
+3. Point source to the streamlit_app/ folder
+4. Add SQL Warehouse as App resource
+5. Deploy
+```
 
 ---
 
-## Dashboard
+## 📄 Documentation
 
-The SQL dashboard shows:
-- Critical / Warning / Normal event counts (KPI cards)
-- Events by pipe segment (grouped bar chart)
-- Worst anomaly score per segment
-- Cumulative anomaly impact
-- Critical alert details table with triggered sensor readings
-- Severity distribution (donut chart)
-
-The Streamlit app (deployed on Databricks Apps) provides the same views with interactive filters for segment, severity, and date range, plus a CSV export.
+- [PORTFOLIO_SUMMARY.md](PORTFOLIO_SUMMARY.md) — project overview for recruiters and portfolio
+- [NOTEBOOK_DESCRIPTIONS.md](NOTEBOOK_DESCRIPTIONS.md) — detailed breakdown of every notebook
 
 ---
 
-## Alert Email Sample
+## 📬 Contact
 
-When critical leaks are detected, the alert engine fires an HTML email with:
-- Segments affected, ranked by severity
-- Min/avg pressure, flow rate, acoustic readings per segment
-- Specific sensor triggers (e.g. "Pressure drop -459 PSI; Flow spike x1.27; Acoustic anomaly z=2.84")
-- Immediate action steps
-- Link to live dashboard
-
----
-
-## Key Engineering Decisions
-
-**Why Isolation Forest?** Unsupervised anomaly detection is ideal here since true leak labels are rare in production. Isolation Forest handles high-dimensional sensor data well and is fast to retrain on new data.
-
-**Why medallion architecture?** Separating raw ingestion (Bronze), feature engineering (Silver), and business logic (Gold) makes the pipeline modular, auditable, and easy to reprocess any layer independently.
-
-**Why `foreachBatch` for streaming Silver?** Window functions (`lag`, `avg`, `stddev`) don't work directly on Spark streams. `foreachBatch` converts each micro-batch to a static DataFrame, applies window logic, and writes to Silver — same result as batch, but triggered by new Bronze records.
-
-**Why `availableNow` trigger on Serverless?** Databricks Serverless clusters don't support continuous `processingTime` triggers. `availableNow` processes all available messages and stops cleanly, which works perfectly with the 30-minute scheduled job.
+Built by [cnero101](https://github.com/cnero101)
