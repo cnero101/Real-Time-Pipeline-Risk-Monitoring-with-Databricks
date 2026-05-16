@@ -259,7 +259,7 @@ print('=== LSTM EVALUATION ===')
 print(classification_report(y_test, y_pred, target_names=['Normal', 'Anomaly']))
 
 # Log to MLflow
-mlflow.set_experiment('/Users/ifeanyinjoku2@gmail.com/pipeline_leak_anomaly_detection')
+mlflow.set_experiment('/Users/your-email@gmail.com/pipeline_leak_anomaly_detection')
 
 # Create signature and input example for Unity Catalog
 with torch.no_grad():
@@ -304,7 +304,7 @@ sample_output = model_lstm(X_train_t[:5]).detach().numpy()
 
 signature = infer_signature(sample_input, sample_output)
 
-mlflow.set_experiment('/Users/ifeanyinjoku2@gmail.com/pipeline_leak_anomaly_detection')
+mlflow.set_experiment('/Users/your-email@gmail.com/pipeline_leak_anomaly_detection')
 
 with mlflow.start_run(run_name='lstm_sequence_detector_v2') as run:
     mlflow.log_param('model_type',       'LSTM')
