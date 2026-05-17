@@ -19,10 +19,13 @@ A production-grade, end-to-end real-time pipeline leak detection system built on
 ## 📸 Screenshots
 
 ### SQL Dashboard — Live Monitoring
-![SQL Dashboard](assets/sql_dashboard.png)
+![SQL Dashboard](assets/dashboard1.png)
+
+### Automated Pipeline DAG — 5 Tasks
+![Automated Pipeline](assets/automated-jobs-pipeline.png)
 
 ### Critical Alert Email
-![Alert Email](assets/alert_email.png)
+![Alert Email](assets/alerts.png)
 
 ---
 
