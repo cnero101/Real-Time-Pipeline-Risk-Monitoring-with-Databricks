@@ -69,6 +69,11 @@ A production-grade, end-to-end real-time pipeline leak detection system built on
     (live KPIs)    (interactive)   (every 30 min)
 ```
 
+### End-to-End Engineering Pipeline
+![End-to-End-Engineering-Pipeline](assets/end-to-end-pipeline.png)
+
+---
+
 **Automated Databricks Job** — 5 tasks, scheduled every 30 minutes, 100% success rate.
 
 ---
