@@ -16,20 +16,6 @@ A production-grade, end-to-end real-time pipeline leak detection system built on
 
 ---
 
-## 📸 Screenshots
-
-### SQL Dashboard — Live Monitoring
-![SQL Dashboard](assets/dashboard1.png)
-![SQL Dashboard](assets/dashboard2.png)
-
-### Automated Pipeline DAG — 5 Tasks
-![Automated Pipeline](assets/automated-jobs-pipeline.png)
-
-### Critical Alert Email
-![Alert Email](assets/alerts.png)
-
----
-
 ## 🏗️ Architecture
 
 ```
@@ -180,6 +166,8 @@ The pipeline runs as a Databricks Job with 5 dependent tasks:
 05_model_retraining
 ```
 
+![](assets/automated-jobs-pipeline.png)
+
 - Schedule: every 30 minutes
 - Average runtime: 1–2 minutes end-to-end
 - All runs: ✅ succeeded
@@ -195,6 +183,8 @@ When critical leaks are detected the alert engine fires an HTML email containing
 - Specific sensor triggers (e.g. `"Pressure drop -459 PSI; Flow spike x1.27; Acoustic anomaly z=2.84"`)
 - Immediate action steps for the on-call engineer
 - Link to the live SQL dashboard
+
+![Alert Email](assets/alerts.png)
 
 ---
 
@@ -247,6 +237,11 @@ ALERT_RECIPIENTS  = ["recipient@email.com"]
 4. 03_gold_scoring              # score and populate Gold
 5. Set up Databricks Job        # automate on a schedule
 ```
+
+### SQL Dashboard — Live Monitoring
+![SQL Dashboard](assets/dashboard1.png)
+![SQL Dashboard](assets/dashboard2.png)
+
 
 ### 4. Deploy the Streamlit app
 ```
