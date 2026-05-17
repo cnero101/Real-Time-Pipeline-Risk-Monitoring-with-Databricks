@@ -70,7 +70,6 @@ A production-grade, end-to-end real-time pipeline leak detection system built on
     (live KPIs)    (interactive)   (every 30 min)
 ```
 
-### End-to-End Engineering Pipeline
 ![](assets/end-to-end-pipeline.png)
 
 ---
