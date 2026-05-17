@@ -71,7 +71,7 @@ A production-grade, end-to-end real-time pipeline leak detection system built on
 ```
 
 ### End-to-End Engineering Pipeline
-![End-to-End-Engineering-Pipeline](assets/end-to-end-pipeline.png)
+![](assets/end-to-end-pipeline.png)
 
 ---
 
