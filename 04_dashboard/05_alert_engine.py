@@ -245,14 +245,11 @@ except NameError:
     raise Exception("Variables missing — please run Cell 1 and Cell 2 first before running this cell.")
 
 # ── Email configuration ──────────────────────────────────────────
-SENDER_EMAIL    = "ifeanyinjoku2@gmail.com"   # Your Gmail address
-SENDER_PASSWORD = "zfmt atit kshr vcul"       # Gmail App Password (see instructions below)
+SENDER_EMAIL    = "your-email@gmail.com"   # Your email address
+SENDER_PASSWORD = "your-app-password"       # Gmail App Password (see instructions below)
 RECEIVER_EMAILS = [
-    "ifeanyinjoku2@gmail.com",                # Your email
-    "cneroklothnz@gmail.com",
-    "toheebayuba82@gmail.com",
-    # "operations@yourcompany.com",           # Add more recipients here
-    # "security@yourcompany.com",
+    "operations@yourcompany.com",           # Add more recipients here
+    "security@yourcompany.com",
 ]
 
 def send_alert_email(subject: str, html_body: str, receivers: list):
