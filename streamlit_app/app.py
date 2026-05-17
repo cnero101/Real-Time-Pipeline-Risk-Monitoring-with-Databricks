@@ -45,8 +45,8 @@ def load_gold():
     import requests
     import time
 
-    host         = "https://dbc-a57c4392-7c2a.cloud.databricks.com"
-    warehouse_id = "a9241e7cbe666b26"
+    host         = "https://your host.cloud.databricks.com" # Host from databricks
+    warehouse_id = "databricks warehouse ID"
 
     # Get OAuth token using the app's service principal credentials
     client_id     = os.environ.get("DATABRICKS_CLIENT_ID")
